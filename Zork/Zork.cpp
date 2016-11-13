@@ -12,19 +12,25 @@
 
 world* whole;
 
-std::list<entity*>::iterator it;
+
 bool QUIT = false;
 void processCommand(std::string command) 
 {
-	if (command.compare("test") == 0)
+	if (command.compare("go north") == 0)
 	{
-		it = whole->contains.begin();
-		std::cout << "\n";
-		std::cout << (*it)->description << "\n";
-		++it;
-		std::cout << (*it)->description << "\n";
-		++it;
-		std::cout << (*it)->description << "\n";
+		whole->goNorth();
+	}
+	if (command.compare("go south") == 0)
+	{
+		whole->goSouth();
+	}
+	if (command.compare("go east") == 0)
+	{
+		whole->goEast();
+	}
+	if (command.compare("go west") == 0)
+	{
+		whole->goWest();
 	}
 	if (command.compare("look") == 0) {
 		whole->playerLook();
@@ -37,12 +43,14 @@ int main()
 	whole = new world();
 	std::string command_input;
 	char key;
+
 	std::cout << "Welcome to Zork!\n";
 	std::cout << "You are a poor farmer working all day long just to be able to put some food on the table. \n";
 	std::cout << "One day, as you are returning from the fields you work in someone aproaches you from behind.\n";
 	std::cout << "Before you can react you feel a strong hit in the back of your head.\n";
 	std::cout << "Just as you fall unconscious you can barely see a big man that grabs you and starts carring you... somewhere. \n";
 	std::cout << "After some time you start regaining consciousness... \n";
+
 	while (true) 
 	{
 		if (QUIT) 

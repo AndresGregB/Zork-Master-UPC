@@ -10,5 +10,11 @@ public:
 	void playerLook();
 
 	player* character;
+	std::list<entity*> entities;
+
+	void world::goNorth();
+	void world::goWest();
+	void world::goEast();
+	void world::goSouth();
 };
 
