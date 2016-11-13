@@ -8,8 +8,7 @@ enum types
 	ROOM,
 	ITEM,
 	EXIT,
-	PLAYER,
-	INVENTORY
+	PLAYER
 
 };
 class entity
