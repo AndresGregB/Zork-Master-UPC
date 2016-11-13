@@ -8,13 +8,17 @@
 #include <string>
 #include <vector>
 #include <conio.h>
+#include "world.h"
+
+
 bool QUIT = false;
 void processCommand(std::string command) 
 {
-
+	
 }
 int main()
-{
+{	
+	world* whole = new world();
 	std::string command_input;
 	char key;
 	std::cout << "Welcome to MyZork!\n";
