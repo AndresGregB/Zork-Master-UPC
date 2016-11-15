@@ -2,8 +2,12 @@
 #include "item.h"
 
 
-item::item()
+item::item(const char* name, const char* desc, const char* use)
 {
+	type = ITEM;
+	description = desc;
+	useItemDesc = use;
+	this->name = name;
 }
 
 

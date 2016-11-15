@@ -10,7 +10,7 @@ public:
 	~player();
 	void player::addToInventory(entity* item);
 
-	entity* inventory;
+	std::list<entity*> inventory;
 	room* containedIn;
 	int inventoryItems;
 };

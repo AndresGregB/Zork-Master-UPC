@@ -16,5 +16,11 @@ public:
 	void world::goWest();
 	void world::goEast();
 	void world::goSouth();
+	void world::processCommand(const char* command);
+	void world::help();
+	void world::lookAt(const char* argument);
+	void world::takeThat(const char* argument);
+	void world::useThat(const char* argument);
+	void world::dropThat(const char* argument);
 };
 

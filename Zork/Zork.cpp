@@ -16,26 +16,28 @@ world* whole;
 bool QUIT = false;
 void processCommand(std::string command) 
 {
+	std::cout << "\n";
 	if (command.compare("go north") == 0)
 	{
 		whole->goNorth();
-	}
-	if (command.compare("go south") == 0)
+	}else if (command.compare("go south") == 0)
 	{
 		whole->goSouth();
-	}
-	if (command.compare("go east") == 0)
+	}else if (command.compare("go east") == 0)
 	{
 		whole->goEast();
-	}
-	if (command.compare("go west") == 0)
+	}else if (command.compare("go west") == 0)
 	{
 		whole->goWest();
-	}
-	if (command.compare("look") == 0) {
+	}else if (command.compare("look") == 0) 
+	{
 		whole->playerLook();
-		//character->containedIn->look();
-		//character->containedIn->
+	}else if (command.compare("help") == 0)
+	{
+		whole->help();
+	}else
+	{
+		whole->processCommand(command.c_str());
 	}
 }
 int main()
