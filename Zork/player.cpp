@@ -4,7 +4,9 @@
 player::player(room* containedIn)
 {
 	this->containedIn = containedIn;
-	inventory = new entity[5];
+	inventory.push_back(new entity());
+	foundKey = false;
+	lockedinCell = true;
 	inventoryItems = 0;
 }
 
@@ -15,6 +17,6 @@ player::~player()
 
 void player::addToInventory(entity* item) 
 {
-	inventory[inventoryItems] = *item;
+	inventory.push_back(item);
 	inventoryItems++;
 }

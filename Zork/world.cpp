@@ -29,7 +29,7 @@ world::world()
 	   |  Deep  | <- You start here
 	   |________|
 	//-------------------------------------------------------*/
-	room* deep = new room("Captive Cell", "When you wake up you find yourself in a prisoner cell. You feel the urge to escape. After a while you notice a rusted key on the floor \n", this);
+	room* deep = new room("Captive Cell", "When you wake up you find yourself in a prisoner cell. You feel the urge to escape. After a while you notice a lockpick on the floor \n", this);
 	room* mid = new room("Mid Room", "This room seems to be the main room of the dungeon. There are exits at North, South and East. \n", this);
 	room* entrance = new room("Entrance to Dungeon", "There is a door by the north side of the room, its probably closed, there is also an exit to the south \n", this);
 	room* extra = new room("Utility Room", "There is only one way in and one way out, this room is empty except for some pots, a table and a chair \n", this);
@@ -69,12 +69,12 @@ world::world()
 	contains.push_back(exterior);
 
 	// Items
-	item* cellKey = new item("Cell Key", "It's a really used key, many people have used it, you can gess many people have been trapped just like you were","With a soft crack the cell opens...");
-	item* dungeonKey = new item("Dungeon Key", "The use of this key seems obvious, hurry up! get out of here!", "As you open the heavy door you feel the warm light of the sun on your skin, oh boy it feels great to be free!");
-	item* pots = new item("Pots", "They are dusty and not really used, there is a key in one of them", "You broke it!");
+	item* lockpick = new item("lockpick", "It's a really used key, many people have used it, you can gess many people have been trapped just like you were","With a soft crack the cell opens...");
+	item* dungeonKey = new item("key", "The use of this key seems obvious, hurry up! get out of here!", "As you open the heavy door you feel the warm light of the sun on your skin, oh boy it feels great to be free!");
+	item* pots = new item("pots", "They are dusty and not really used, there is a key in one of them", "You broke it!");
 
-	deep->contains.push_back(cellKey);
-	cellKey->containedIn = deep;
+	deep->contains.push_back(lockpick);
+	lockpick->containedIn = deep;
 
 	pots->contains.push_back(dungeonKey);
 	dungeonKey->containedIn = pots;
@@ -82,7 +82,7 @@ world::world()
 	extra->contains.push_back(pots);
 	pots->containedIn = extra;
 
-	contains.push_back(cellKey);
+	contains.push_back(lockpick);
 	contains.push_back(dungeonKey);
 	contains.push_back(pots);
 }
@@ -97,26 +97,31 @@ void world::playerLook()
 }
 void world::goNorth() 
 {
-	// Check exit exists
-	if (character->containedIn->north == NULL) {
-		std::cout << "\n You can not go anywhere in that direction\n";
+	if (character->lockedinCell) {
+		std::cout << "You are locked in a cell! You can not move! \n";
 	}
-	else if (character->containedIn->north->locked == true)
-	{
-		std::cout << "That door is locked! \n";
-	}
-	else 
-	{
-		if (character->containedIn->north->endA->name.compare(character->containedIn->name) == 0)
-		{
-			character->containedIn = character->containedIn->north->endB;
+	else {
+		// Check exit exists
+		if (character->containedIn->north == NULL) {
+			std::cout << "\n You can not go anywhere in that direction\n";
 		}
-		else 
+		else if (character->containedIn->north->locked == true)
 		{
-			character->containedIn = character->containedIn->north->endA;
+			std::cout << "That door is locked! \n";
 		}
+		else
+		{
+			if (character->containedIn->north->endA->name.compare(character->containedIn->name) == 0)
+			{
+				character->containedIn = character->containedIn->north->endB;
+			}
+			else
+			{
+				character->containedIn = character->containedIn->north->endA;
+			}
 
-		world::playerLook();
+			world::playerLook();
+		}
 	}
 }
 void world::goSouth()
@@ -233,16 +238,40 @@ void world::help()
 }
 void world::lookAt(const char* argument) 
 {
-	// acceder a la lista de elementos de la habitacion y buscar uno con el mismo nombre que el argumento
-	// Si se encuentra mostrar su descripcion
-	// Si no se encuentra printar "there is no such thing on sight"
+	bool found = false;
+	std::list<entity*>::iterator iter;
+	for (iter = character->containedIn->contains.begin(); iter != character->containedIn->contains.end(); ++iter)
+	{
+		if ((*iter)->name.compare(std::string(argument)) == 0) {
+			found = true;
+			(*iter)->look();
+			break;
+		}
+	}
+	if (!found)
+	{
+		std::cout << "There is no such an thing on sight \n";
+	}
 }
 void world::takeThat(const char* argument)
 {
-	// acceder a la lista de elementos de la habitacion
-	// buscar elemento con nombre de argumento
-	//  si se encuentra añadir elemento al inventario del jugador y eliminarlo de la lista de elementos en la habitacion, cambiar el "contained in" del elemento
-	// si no se encuentra mensaje de fallo
+	bool found = false;
+	std::list<entity*>::iterator iter;
+	for (iter = character->containedIn->contains.begin(); iter != character->containedIn->contains.end(); ++iter)
+	{
+		if ((*iter)->name.compare(std::string(argument)) == 0) {
+			found = true;
+			(*iter)->containedIn = character;
+			character->addToInventory(*iter);
+			character->containedIn->contains.erase(iter);
+			std::cout << "you picked " << argument << "\n";
+			break;
+		}
+	}
+	if (!found)
+	{
+		std::cout << "There is no such an item on sight \n";
+	}
 }
 void world::useThat(const char* argument)
 {
@@ -252,11 +281,23 @@ void world::useThat(const char* argument)
 }
 void world::dropThat(const char* argument)
 {
-	// buscar item en inventario
-	// dejarlo en la habitacion
+	
 	bool found = false;
 	std::list<entity*>::iterator iter;
-	for (iter = character->inventory.begin(); iter != character->inventory.end(); ++iter) {
-		std::cout << *iter;
+	for (iter = character->inventory.begin(); iter != character->inventory.end(); ++iter) 
+	{
+		if ((*iter)->name.compare(std::string(argument))== 0) {
+			found = true;
+			(*iter)->containedIn = character->containedIn;
+			character->containedIn->contains.push_back(*iter);
+			character->inventory.erase(iter);
+			character->inventoryItems--;
+			std::cout << "you droped " << argument << "\n";
+			break;
+		}
+	}
+	if (!found) 
+	{
+		std::cout << "You dont have an item with such name!\n";
 	}
 }
