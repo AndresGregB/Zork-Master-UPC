@@ -235,6 +235,7 @@ void world::help()
 		std::cout << "take  \n";
 		std::cout << "pick (same as take)  \n";
 		std::cout << "use \n";
+		std::cout << "go (north/south/east/west) \n";
 		std::cout << "quit \n";
 }
 void world::lookAt(const char* argument) 
