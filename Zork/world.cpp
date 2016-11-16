@@ -210,10 +210,10 @@ void world::processCommand(const char* command)
 		std::cout << "To many arguments, please use commands with only two arguments\n";
 	}
 	else {
-		if (arguments[0].compare("look") == 0) {
+		if (arguments[0].compare("inspect") == 0) {
 			lookAt(arguments[1].c_str());
 		}
-		else if (arguments[0].compare("take") == 0) {
+		else if (arguments[0].compare("take") == 0 || arguments[0].compare("pick") == 0) {
 			takeThat(arguments[1].c_str());
 		}
 		else if (arguments[0].compare("use") == 0) {
@@ -231,8 +231,9 @@ void world::help()
 {
 		std::cout << "The lists of commands you can use are: \n";
 		std::cout << "help \n";
-		std::cout << "look \n";
-		std::cout << "take \n";
+		std::cout << "inspect \n";
+		std::cout << "take  \n";
+		std::cout << "pick (same as take)  \n";
 		std::cout << "use \n";
 		std::cout << "quit \n";
 }
@@ -245,6 +246,23 @@ void world::lookAt(const char* argument)
 		if ((*iter)->name.compare(std::string(argument)) == 0) {
 			found = true;
 			(*iter)->look();
+			if ((*iter)->name.compare("pots") == 0 && character->foundKey == false)
+			{ 
+				
+				std::list<entity*>::iterator iter2;
+				for (iter2 = (*iter)->contains.begin(); iter2 != (*iter)->contains.end(); ++iter2)
+				{
+					
+					if ((*iter2)->name.compare("key")== 0) {
+						character->foundKey = true;
+						(*iter2)->containedIn = character->containedIn;
+						character->containedIn->contains.push_back(*iter2);
+						(*iter)->contains.erase(iter2);
+						std::cout << "The key fall from the pots! You hear a metallic sound as it reaches the floor of the room \n";
+						break;
+					}
+				}
+			}
 			break;
 		}
 	}
@@ -270,14 +288,57 @@ void world::takeThat(const char* argument)
 	}
 	if (!found)
 	{
-		std::cout << "There is no such an item on sight \n";
+		
+			std::cout << "There is no such an item on sight \n";
+		
+		
 	}
 }
 void world::useThat(const char* argument)
 {
-	// buscar en la lista del inventario del jugador
-	// si se encuentra usar (solo se podran usar las llaves en la celda y la salida)
-	// si no se encuentra dar mensaje de error
+	bool found = false;
+	std::list<entity*>::iterator iter;
+	for (iter = character->inventory.begin(); iter != character->inventory.end(); ++iter)
+	{
+		if ((*iter)->name.compare(std::string(argument)) == 0) 
+		{
+			found = true;
+			if ((*iter)->name.compare("lockpick") == 0) {
+				if (character->lockedinCell && character->containedIn->name.compare("Captive Cell") == 0) {
+					
+					std::cout << "You used the lockpick and escaped the cell! \n";
+					character->lockedinCell = false;
+				}
+				else if (character->lockedinCell == false && character->containedIn->name.compare("Captive Cell") == 0) {
+					std::cout << "You already escaped the cell \n";
+				}
+				else {
+					std::cout << "This has no use here... \n";
+				}
+			}else if ((*iter)->name.compare("key") == 0) 
+			{
+				if (character->containedIn->name.compare("Entrance to Dungeon") == 0 && character->containedIn->north->locked) {
+					std::cout << "You used the key on the  locked door... it cracks while its opening. You can go out now...\n";
+					character->containedIn->north->locked = false;
+				}
+				else if (character->containedIn->name.compare("Entrance to Dungeon") == 0 && character->containedIn->north->locked) {
+					std::cout << "The door is already open \n";
+				}
+				else {
+					std::cout << "This has no use here... \n";
+				}
+			}
+			else {
+				std::cout << "You used " << argument << " but nothing happended \n";
+			}
+			break;
+		}
+	}
+	if (!found)
+	{
+		std::cout << "You dont have an item with such name!\n";
+	}
+
 }
 void world::dropThat(const char* argument)
 {
