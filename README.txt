@@ -19,8 +19,8 @@ In orther to escape the dungeon you need to get to the exterior of the dungeon.
 The map looks (more or less) like this:
 
 		Exterior
-		__|  |__ <- Way out (win)
-	   |        |					N
+        __|  |__ <- Way out (win)
+	   |        |                   N
 	   |Entrance|				  W   E
 	   |__    __|				    S
 		__|  |__    ______
